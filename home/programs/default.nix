@@ -70,8 +70,7 @@
       '';
 
       shellAliases = {
-        nrs = "sudo nixos-rebuild switch";
-        nrsc = "git add -A && sudo nixos-rebuild switch && git commit";
+        nrs = "git add -A && sudo nixos-rebuild switch && git commit";
         rmpctty = "kitty --detach --hold -e rmpc";
       };
 

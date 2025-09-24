@@ -258,7 +258,7 @@
         amdgpu_top
         htop
         faudio
-        qemu
+        quickemu
         ssh-to-age
         git-crypt
       ]);
