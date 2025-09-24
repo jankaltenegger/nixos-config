@@ -35,6 +35,7 @@
     # Configuring root and main user as trusted users for cachix to let devenv manage the caching
     extraOptions = ''
       trusted-users = root jan
+      warn-dirty = false
     '';
 
     package = pkgs.nixVersions.stable;
@@ -142,20 +143,6 @@
       pulse.enable = true;
       jack.enable = true;
       wireplumber.enable = true;
-
-      extraConfig.pipewire-pulse."10-bluez" = {
-        "context.modules" = [
-          {name = "libpipewire-module-bluez5-discover";}
-          {
-            name = "libpipewire-module-bluez5-device";
-            args = {"autoconnect" = true;};
-          }
-        ];
-        "stream.properties" = {
-          "bluez5.codecs" = ["aac" "ldac" "aptx" "aptx_hd" "sbc_xq"];
-          "bluez5.autoswitch-profile" = true;
-        };
-      };
     };
 
     hardware.bolt.enable = true;
