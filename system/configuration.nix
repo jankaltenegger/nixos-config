@@ -202,7 +202,7 @@
     users.jan = {
       isNormalUser = true;
       description = "Jan Kaltenegger";
-      extraGroups = ["gamemode" "wheel" "networkmanager" "docker"];
+      extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker"];
       packages = with pkgs; [brave inputs.zen-browser.packages."${system}".default];
     };
   };
