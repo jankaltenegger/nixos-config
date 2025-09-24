@@ -89,7 +89,15 @@
       };
     };
 
-    bluetooth.enable = true;
+    bluetooth = {
+      enable = true;
+      settings = {
+        General = {
+          Experimental = true;
+          FastConnectable = true;
+        };
+      };
+    };
   };
 
   services = {
@@ -134,6 +142,20 @@
       pulse.enable = true;
       jack.enable = true;
       wireplumber.enable = true;
+
+      extraConfig.pipewire-pulse."10-bluez" = {
+        "context.modules" = [
+          {name = "libpipewire-module-bluez5-discover";}
+          {
+            name = "libpipewire-module-bluez5-device";
+            args = {"autoconnect" = true;};
+          }
+        ];
+        "stream.properties" = {
+          "bluez5.codecs" = ["aac" "ldac" "aptx" "aptx_hd" "sbc_xq"];
+          "bluez5.autoswitch-profile" = true;
+        };
+      };
     };
 
     hardware.bolt.enable = true;
@@ -224,33 +246,35 @@
   qt.enable = true;
 
   environment = {
-    systemPackages = [
-      inputs.zen-browser.packages.${pkgs.system}.default
-    ] ++ (with pkgs; [
-      fwupd
-      swayosd
-      file
-      wget
-      git
-      git-crypt
-      gnupg
-      socat
-      usbutils
-      libmtp
-      fusee-nano
-      zip
-      unzip
-      amdvlk
-      driversi686Linux.amdvlk
-      mesa
-      driversi686Linux.mesa
-      amdgpu_top
-      htop
-      faudio
-      quickemu
-      ssh-to-age
-      git-crypt
-    ]);
+    systemPackages =
+      [
+        inputs.zen-browser.packages.${pkgs.system}.default
+      ]
+      ++ (with pkgs; [
+        fwupd
+        swayosd
+        file
+        wget
+        git
+        git-crypt
+        gnupg
+        socat
+        usbutils
+        libmtp
+        fusee-nano
+        zip
+        unzip
+        amdvlk
+        driversi686Linux.amdvlk
+        mesa
+        driversi686Linux.mesa
+        amdgpu_top
+        htop
+        faudio
+        quickemu
+        ssh-to-age
+        git-crypt
+      ]);
 
     sessionVariables = {
       QT_QPA_PLATFORM = "wayland";
