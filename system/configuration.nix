@@ -1,8 +1,8 @@
 {
   pkgs,
+  unstable-pkgs,
   inputs,
   system,
-  config,
   ...
 }: {
   imports = [
@@ -92,6 +92,7 @@
 
     bluetooth = {
       enable = true;
+      package = unstable-pkgs.bluez;
       settings = {
         General = {
           Experimental = true;

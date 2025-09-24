@@ -18,22 +18,18 @@
     config.allowUnfree = true;
   };
 
-  stable-pkgs = import inputs.nixpkgs-stable {
-    inherit system inputs;
-    config.allowUnfree = true;
-  };
 in {
   ymir = nixosSystem {
     inherit lib pkgs system;
 
-    specialArgs = { inherit system secrets inputs; };
+    specialArgs = { inherit unstable-pkgs system secrets inputs; };
 
     modules = [
       ../system/configuration.nix
       inputs.home-manager.nixosModules.home-manager
       {
         home-manager = {
-          extraSpecialArgs = {inherit inputs secrets stable-pkgs unstable-pkgs;};
+          extraSpecialArgs = {inherit inputs secrets unstable-pkgs;};
           useGlobalPkgs = true;
           useUserPackages = true;
           backupFileExtension = "bkp";
