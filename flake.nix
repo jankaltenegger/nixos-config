@@ -48,7 +48,7 @@
   outputs = inputs:
   with inputs; let
     system = "x86_64-linux";
-    secrets = builtins.fromJSON (builtins.readFile "${self}/secrets/secrets.json");
+#    secrets = builtins.fromJSON (builtins.readFile "${self}/secrets/secrets.json");
   in {
     nixosConfigurations =
       import ./outputs/nixos-conf.nix {inherit inputs secrets system;};

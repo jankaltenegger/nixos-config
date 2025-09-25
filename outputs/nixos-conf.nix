@@ -19,7 +19,7 @@
   };
 
 in {
-  ymir = nixosSystem {
+  nixos = nixosSystem {
     inherit lib pkgs system;
 
     specialArgs = { inherit unstable-pkgs system secrets inputs; };

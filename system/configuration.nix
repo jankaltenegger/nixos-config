@@ -59,15 +59,14 @@
     };
 
     initrd = {
-      luks.devices."root" = {
-        device = "/dev/disk/by-uuid/c30a1fa7-ff43-4a57-b656-708b8168aad2";
-        preLVM = true;
-        keyFile = "/keyfile0.bin";
-        allowDiscards = true;
+      luks.devices."niflheim" = {
+	device = "/dev/disk/by-uuid/3bc345ec-bc96-4fd2-9c19-3fab91e5f05a";
+	keyFile = "/keyfile.bin";
+	allowDiscards = true;
       };
 
       secrets = {
-        "keyfile0.bin" = /etc/secrets/initrd/keyfile0.bin;
+	"keyfile.bin" = "/etc/secrets/initrd/keyfile.bin";
       };
 
       kernelModules = ["amdgpu"];

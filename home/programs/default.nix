@@ -101,9 +101,10 @@
     git = {
       enable = true;
       userName = "jankaltenegger";
-      extraConfig = {
-        user.email = "${secrets.github.email}";
-      };
+      userEmail = "jkaltenegger@ggc.edu";
+      #extraConfig = {
+      #  user.email = "${secrets.github.email}";
+      #};
     };
   };
 }
