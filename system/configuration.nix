@@ -262,6 +262,7 @@
         quickemu
         ssh-to-age
         git-crypt
+        gvfs
       ]);
 
     sessionVariables = {
