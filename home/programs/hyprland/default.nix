@@ -10,6 +10,7 @@
 
     # File Manager
     xfce.thunar
+    xfce.thunar-volman
     xfce.xfconf
     xfce.tumbler
     xfce.thunar-archive-plugin
