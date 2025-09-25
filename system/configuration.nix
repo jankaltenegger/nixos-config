@@ -79,7 +79,7 @@
 
             # We first mount the BTRFS root to /mnt
             # so we can manipulate btrfs subvolumes.
-            mount -o subvol=/ /dev/mapper/enc /mnt
+            mount -o subvol=/ /dev/mapper/niflheim /mnt
 
             # While we're tempted to just delete /root and create
             # a new snapshot from /root-blank, /root is already
