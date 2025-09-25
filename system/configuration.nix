@@ -254,6 +254,7 @@
       description = "Jan Kaltenegger";
       extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker"];
       packages = with pkgs; [brave inputs.zen-browser.packages."${system}".default];
+      initialPassword = "changeme";
     };
   };
 
@@ -317,6 +318,17 @@
     sessionVariables = {
       QT_QPA_PLATFORM = "wayland";
       MOZ_ENABLE_WAYLAND = 1;
+    };
+
+    persistence."/persistent" = {
+      enable = true;
+      directories = [ ];
+      files = [
+        "/etc/secrets/initrd/keyfile.bin"
+      ];
+      users.jan = {
+        directories = [ ];
+      };
     };
   };
 

@@ -2,6 +2,11 @@
   description = "Jan's lil flake";
 
   inputs = {
+    # Impermanence
+    impermanence = {
+      url = "github:nix-community/impermanence";
+    };
+
     # Nix Packages Repo
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -41,16 +46,14 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-
-
   };
 
   outputs = inputs:
-  with inputs; let
-    system = "x86_64-linux";
-#    secrets = builtins.fromJSON (builtins.readFile "${self}/secrets/secrets.json");
-  in {
-    nixosConfigurations =
-      import ./outputs/nixos-conf.nix {inherit inputs secrets system;};
-  };
+    with inputs; let
+      system = "x86_64-linux";
+      #    secrets = builtins.fromJSON (builtins.readFile "${self}/secrets/secrets.json");
+    in {
+      nixosConfigurations =
+        import ./outputs/nixos-conf.nix {inherit inputs secrets system;};
+    };
 }

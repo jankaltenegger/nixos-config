@@ -25,6 +25,7 @@ in {
     specialArgs = { inherit unstable-pkgs system secrets inputs; };
 
     modules = [
+      inputs.impermanence.nixosModules.impermanence
       ../system/configuration.nix
       inputs.home-manager.nixosModules.home-manager
       {
