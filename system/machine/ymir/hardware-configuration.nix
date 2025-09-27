@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "usb_storage" "sd_mod" ];
@@ -14,50 +15,39 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=root" "compress=zstd" "noatime" ];
+    {
+      device = "none";
+      fsType = "tmpfs";
+      options = [ "defaults" "size=8G" "mode=755" ];
     };
-
-  boot.initrd.luks.devices."niflheim".device = "/dev/disk/by-uuid/3bc345ec-bc96-4fd2-9c19-3fab91e5f05a";
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=boot" "compress=zstd" "noatime" ];
-      neededForBoot = true;
-    };
-
-  fileSystems."/boot/efi" =
-    { device = "/dev/disk/by-uuid/5108-5A40";
+    {
+      device = "/dev/disk/by-uuid/9B63-4E5A";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
-    };
-
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=home" "compress=zstd" "noatime" ];
+      options = [ "fmask=0077" "dmask=0077" ];
     };
 
   fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=nix" "compress=zstd" "noatime" ];
+    {
+      device = "/dev/disk/by-uuid/aee17ade-2317-4957-b695-554b4292d921";
+      fsType = "ext4";
     };
 
-  fileSystems."/persist" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=persist" "compress=zstd" "noatime" ];
-      neededForBoot = true;
+  boot.initrd.luks.devices."niflheim".device = "/dev/disk/by-uuid/55b40caf-5cd7-4b24-9ecc-a66ba42e5c07";
+
+  fileSystems."/etc/nixos" =
+    {
+      device = "/nix/persist/etc/nixos";
+      fsType = "none";
+      options = [ "bind" ];
     };
 
   fileSystems."/var/log" =
-    { device = "/dev/disk/by-uuid/46760402-dcfa-4eff-a0b7-2024c699855f";
-      fsType = "btrfs";
-      options = [ "subvol=log" "compress=zstd" "noatime" ];
-      neededForBoot = true;
+    {
+      device = "/nix/persist/var/log";
+      fsType = "none";
+      options = [ "bind" ];
     };
 
   swapDevices = [ ];
