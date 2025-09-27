@@ -3,6 +3,7 @@
     hideMounts = true;
     directories = [
       "/var/log"
+      "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
     ];
@@ -15,6 +16,19 @@
     users.jan = {
       directories = [
         "nixos-config"
+
+        ".zen"
+        ".cache/zen"
+
+        ".config/vesktop"
+        ".config/obsidian"
+        ".local/share/TelegramDesktop"
+
+        ".cache/zellij"
+        ".cache/fastfetch"
+
+        ".local/share/zoxide"
+
         "Downloads"
       ];
       files = [

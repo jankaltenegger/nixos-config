@@ -70,8 +70,10 @@
       '';
 
       shellAliases = {
-        nrs = "git add -A && sudo nixos-rebuild switch && git commit";
+        nrs = "sudo nixos-rebuild switch --flake /home/jan/nixos-config/";
+        nrsc = "git add -A && sudo nixos-rebuild switch --flake /home/jan/nixos-config/ && git commit";
         rmpctty = "kitty --detach --hold -e rmpc";
+        findimp = "sudo fd --one-file-system --base-directory / --type f --hidden --exclude '{tmp,etc/passwd}'";
       };
 
       syntaxHighlighting = {
