@@ -1,6 +1,7 @@
 {
   pkgs,
   unstable-pkgs,
+  lib,
   inputs,
   system,
   ...
@@ -196,6 +197,9 @@
   };
 
   programs = {
+    _1password.enable = true;
+    _1password-gui.enable = true;
+
     zsh.enable = true;
     steam.enable = true;
     hyprland = {
@@ -221,11 +225,22 @@
   qt.enable = true;
 
   environment = {
+    etc = {
+      "1password/custom_allowed_browsers" = {
+        text = ''
+          zen
+        '';
+        mode = "0755";
+      };
+    };
+
     systemPackages =
       [
         inputs.zen-browser.packages.${pkgs.system}.default
       ]
       ++ (with pkgs; [
+        _1password-gui
+        _1password
         fwupd
         swayosd
         file
@@ -255,17 +270,6 @@
     sessionVariables = {
       QT_QPA_PLATFORM = "wayland";
       MOZ_ENABLE_WAYLAND = 1;
-    };
-
-    persistence."/persistent" = {
-      enable = true;
-      directories = [ ];
-      files = [
-        "/etc/secrets/initrd/keyfile.bin"
-      ];
-      users.jan = {
-        directories = [ ];
-      };
     };
   };
 
