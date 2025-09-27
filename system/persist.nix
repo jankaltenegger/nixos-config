@@ -24,12 +24,21 @@
         ".config/obsidian"
         ".local/share/TelegramDesktop"
 
+        ".config/zellij"
         ".cache/zellij"
         ".cache/fastfetch"
 
         ".local/share/zoxide"
+        ".local/share/direnv"
 
+        "devenv"
         "Downloads"
+        "Documents"
+        "Calibre Library"
+        "Music"
+        "Pictures"
+        "Videos"
+        "vm"
       ];
       files = [
         ".bash_history"
