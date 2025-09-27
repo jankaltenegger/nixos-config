@@ -240,7 +240,7 @@
       ]
       ++ (with pkgs; [
         _1password-gui
-        _1password
+        _1password-cli
         fwupd
         swayosd
         file

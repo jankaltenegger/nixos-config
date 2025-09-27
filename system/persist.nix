@@ -47,6 +47,7 @@
       ];
 
       files = [
+        ".local/state/lazygit/state.yml"
         ".local/share/hyprland/lastVersion"
         ".bash_history"
         ".config/systemsettingsrc"
