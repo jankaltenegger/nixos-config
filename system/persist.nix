@@ -14,6 +14,7 @@
     ];
     users.jan = {
       directories = [
+        "nixos-config"
         "Downloads"
       ];
       files = [
