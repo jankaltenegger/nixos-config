@@ -89,6 +89,7 @@
         "opacity 1.0 override, class:(.*Minecraft.*)"
         "opacity 0.7 override, class:(kitty)"
         "opacity 1.0 override, title:(Lilith's Throne 0.4.11.3 Alpha)"
+        "opacity 1.0 override, class:(jam-app)"
       ];
 
       #################

@@ -3,10 +3,6 @@
   unstable-pkgs,
   ...
 }: {
-  home.packages = with unstable-pkgs; [
-    tailwindcss-language-server
-  ];
-
   programs.nixvim = {
     plugins = {
       lsp-format = {
@@ -53,7 +49,6 @@
           };
           tailwindcss = {
             enable = true;
-            package = unstable-pkgs.tailwindcss-language-server;
           };
 
           qmlls = {
