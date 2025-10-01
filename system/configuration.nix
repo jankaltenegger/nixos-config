@@ -49,14 +49,15 @@
     loader = {
       efi = {
         canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
+        efiSysMountPoint = "/boot/efi";
       };
 
       grub = {
         enable = true;
-        device = "nodev";
         efiSupport = true;
+        device = "nodev";
         enableCryptodisk = true;
+        copyKernels = true;
       };
     };
 
@@ -64,6 +65,43 @@
       options snd-hda-intel model=dell-headset-multi
     '';
   }; # You're good to touch shit again
+
+  boot.initrd.secrets."/keyfile.bin" = "/persist/etc/secrets/initrd/keyfile.bin";
+  boot.initrd.luks.devices."niflheim" = {
+    device = "/dev/disk/by-uuid/e816eae0-8263-4a0b-afaa-35a938f6ef2a";
+    keyFile = "/keyfile.bin";
+    allowDiscards = true;
+  };
+
+  boot.initrd.systemd = {
+    enable = true;
+    services.rollback = {
+      description = "Rollback BTRFS root subvolume to a pristine state";
+      wantedBy = ["initrd.target"];
+
+      after = ["systemd-cryptsetup@niflheim.service"];
+
+      before = ["sysroot.mount"];
+
+      unitConfig.DefaultDependencies = "no";
+      serviceConfig.Type = "oneshot";
+      script = ''
+        mkdir -p /mnt
+        mount -o subvol=/ /dev/mapper/niflheim /mnt
+        btrfs subvolume list -o /mnt/root |
+          cut -f9 -d' ' |
+          while read subvolume; do
+            echo "deleting /$subvolume subvolume..."
+            btrfs subvolume delete "/mnt/$subvolume"
+          done &&
+          echo "deleting /root subvolume..." &&
+          btrfs subvolume delete /mnt/root
+        echo "restoring blank /root subvolume..."
+        btrfs subvolume snapshot /mnt/root-blank /mnt/root
+        umount /mnt
+      '';
+    };
+  };
 
   hardware = {
     enableAllFirmware = true;

@@ -2,8 +2,6 @@
   environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [
-      "/var/log"
-
       "/etc/ssh"
 
       "/var/lib/nixos"
