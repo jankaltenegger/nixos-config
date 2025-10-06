@@ -25,15 +25,15 @@ in {
     specialArgs = { inherit unstable-pkgs system secrets inputs; };
 
     modules = [
-      inputs.impermanence.nixosModules.impermanence
       ../system/configuration.nix
       inputs.home-manager.nixosModules.home-manager
+      inputs.impermanence.nixosModules.impermanence
       {
         home-manager = {
           extraSpecialArgs = {inherit inputs secrets unstable-pkgs;};
           useGlobalPkgs = true;
           useUserPackages = true;
-          backupFileExtension = "bkp";
+          backupFileExtension = "backup";
           users.jan = import ../home/home.nix;
         };
       }
