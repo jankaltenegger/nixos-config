@@ -6,14 +6,13 @@
     ./floaterm.nix
     ./lualine.nix
     ./telescope.nix
-    ./indent-blankline.nix
     ./fidget.nix
     ./none-ls.nix
     ./nvim-notify.nix
     ./hardtime.nix
     ./flash.nix
     ./trouble.nix
-    ./jdtls.nix
+    ./snacks.nix
   ];
 
   programs.nixvim = {

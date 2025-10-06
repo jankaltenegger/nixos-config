@@ -3,17 +3,13 @@
   programs.nixvim.plugins = {
     treesitter = {
       enable = true;
-
       nixvimInjections = true;
-
-      grammarPackages = [
-        pkgs.vimPlugins.nvim-treesitter-parsers.qmljs
-      ];
 
       settings = {
         highlight.enable = true;
         indent.enable = true;
       };
+
       folding = true;
     };
 

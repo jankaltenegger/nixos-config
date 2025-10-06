@@ -35,13 +35,16 @@ in {
     userDirs = {
       enable = true;
       createDirectories = true;
+      desktop = null;
+      publicShare = null;
+      templates = null;
     };
     mimeApps = {
       enable = true;
       defaultApplications = {
-        "text/html"              = [ "zen.desktop" ];
-        "x-scheme-handler/http"  = [ "zen.desktop" ];
-        "x-scheme-handler/https" = [ "zen.desktop" ];
+        "text/html" = ["zen.desktop"];
+        "x-scheme-handler/http" = ["zen.desktop"];
+        "x-scheme-handler/https" = ["zen.desktop"];
       };
     };
   };
@@ -55,5 +58,4 @@ in {
       name = "Nordzy-dark";
     };
   };
-
 }

@@ -36,7 +36,6 @@
         settings.cmp = {
           enable = true;
           menu = {
-            copilot = "[copilot]";
             nvim_lsp = "[LSP]";
             nvim_lua = "[api]";
             path = "[path]";
@@ -45,29 +44,6 @@
             neorg = "[neorg]";
           };
         };
-      };
-
-      copilot-lua = {
-        enable = true;
-        settings = {
-          panel = {
-            enabled = false;
-          };
-          suggestion = {
-            enabled = false;
-          };
-          filetypes = {
-            javascript = true;
-            javascriptreact = true;
-            typescript = true;
-            typescriptreact = true;
-            "*" = false;
-          };
-        };
-      };
-
-      copilot-cmp = {
-        enable = true;
       };
 
       cmp = {
@@ -107,9 +83,6 @@
           };
 
           sources = [
-            {
-              name = "copilot";
-            }
             {
               name = "nvim_lsp";
             }

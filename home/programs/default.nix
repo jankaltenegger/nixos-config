@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   secrets,
   ...
 }: {
@@ -26,7 +27,6 @@
     mullvad-vpn # VPN
     kicad # Electronics Design Suite
     vesktop
-    firefox # Self-explanatory, I believe
     cozy #Audiobook player
     geckodriver
     gnome-disk-utility
@@ -34,14 +34,103 @@
     bottles
     mangohud
     transmission_4-gtk
-    yazi
     bluetui
     docker
     zap
     spotify
+    ouch
+    exiftool
+    kdePackages.okular
   ];
 
   programs = {
+    yazi = {
+      enable = true;
+      enableZshIntegration = true;
+      plugins = {
+        inherit (pkgs.yaziPlugins) ouch;
+      };
+      keymap = {
+        mgr.prepend_keymap = [
+          {
+            run = "plugin ouch";
+            on = ["C"];
+            desc = "Compress with ouch";
+          }
+        ];
+      };
+      settings = {
+        preview = {
+          ueberzug_offset = [1.5 1.5 2 2];
+        };
+        opener = {
+          extract = [
+            {
+              run = "ouch d -y '$@'";
+              desc = "Extract here with ouch";
+              for = "unix";
+            }
+          ];
+        };
+        plugin = {
+          prepend_previewers = [
+            {
+              mime = "application/*zip";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-tar";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-bzip2";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-7z-compressed";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-rar";
+              run = "ouch";
+            }
+            {
+              mime = "application/vnd.rar";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-xz";
+              run = "ouch";
+            }
+            {
+              mime = "application/xz";
+              run = "ouch";
+            }
+            {
+              mime = "application/x-zstd";
+              run = "ouch";
+            }
+            {
+              mime = "application/zstd";
+              run = "ouch";
+            }
+            {
+              mime = "application/java-archive";
+              run = "ouch";
+            }
+          ];
+        };
+      };
+    };
+
+    zellij = {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        theme = "nord";
+      };
+    };
+
     direnv = {
       enable = true;
       enableZshIntegration = true;
@@ -64,10 +153,22 @@
     zsh = {
       enable = true;
       enableCompletion = true;
-      initContent = ''
-        eval "$(direnv hook zsh)"
-        fastfetch
-      '';
+      initContent = let
+        zshConfigEarlyInit = lib.mkOrder 500 ''
+          eval "$(direnv hook zsh)"
+          fastfetch
+        '';
+        zshConfig = lib.mkOrder 1000 ''
+          function y() {
+            local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+            yazi "$@" --cwd-file="$tmp"
+            IFS= read -r -d "" cwd < "$tmp"
+            [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+            rm -f -- "$tmp"
+          }
+        '';
+      in
+        lib.mkMerge [zshConfigEarlyInit zshConfig];
 
       shellAliases = {
         nrs = "sudo nixos-rebuild switch --flake /home/jan/nixos-config/";
@@ -84,13 +185,6 @@
     bash.enable = true;
 
     zoxide.enable = true;
-
-    zellij = {
-      enable = true;
-      enableZshIntegration = true;
-      settings = {
-      };
-    };
 
     fastfetch = {
       enable = true;
