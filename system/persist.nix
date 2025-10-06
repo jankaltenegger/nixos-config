@@ -2,6 +2,8 @@
   environment.persistence."/nix/persist" = {
     hideMounts = true;
     directories = [
+      "/var/lib/bluetooth"
+
       "/etc/ssh"
 
       "/var/lib/nixos"
@@ -15,25 +17,33 @@
 
     users.jan = {
       directories = [
+        # NixOS Configuration
         "nixos-config"
 
+        # Zen Browser
         ".zen"
         ".cache/zen"
 
+        # 1Password
         ".config/1Password"
 
+        # Vesktop / Discord
         ".config/vesktop"
+
+        # Obsidian
         ".config/obsidian"
+
+        # Telegram
         ".local/share/TelegramDesktop"
 
+        # Zellij
         ".config/zellij"
         ".cache/zellij"
+
+        # Fastfetch (faster loading)
         ".cache/fastfetch"
 
-        ".local/share/zoxide"
-        ".local/share/direnv"
-        ".ssh"
-
+        # User Folders
         "devenv"
         "Downloads"
         "Documents"
@@ -42,6 +52,12 @@
         "Pictures"
         "Videos"
         "vm"
+
+        # Misc
+        ".local/share/zoxide"
+        ".local/share/direnv"
+        ".local/state/wireplumber" # For BT auto-connect
+        ".ssh"
       ];
 
       files = [

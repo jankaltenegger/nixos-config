@@ -229,8 +229,8 @@
       isNormalUser = true;
       description = "Jan Kaltenegger";
       extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker"];
-      packages = with pkgs; [brave inputs.zen-browser.packages."${system}".default];
-      initialPassword = "changeme";
+      packages = [ inputs.zen-browser.packages."${system}".default ];
+      initialHashedPassword = "$6$a0APTJTEwx2F3sS4$OjD4KqoqZkmhHstu7aK545Gm/y.tRN4Ykj.mHr5PODRlej/v6Zb4M19NdvTk2BNV0xv7ROQV1gfcWeC6lZ8u//";
     };
   };
 
@@ -279,6 +279,7 @@
       ++ (with pkgs; [
         _1password-gui
         _1password-cli
+        ueberzugpp
         fwupd
         swayosd
         file
@@ -333,6 +334,7 @@
   stylix = {
     enable = true;
     autoEnable = true;
+    polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
     image = pkgs.fetchurl {
       url = "https://r4.wallpaperflare.com/wallpaper/26/956/1004/fantasy-art-dragon-ultrawide-ultra-wide-hd-wallpaper-4001fb4189f6070f700851722474b2c5.jpg";
