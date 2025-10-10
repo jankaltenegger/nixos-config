@@ -1,34 +1,66 @@
 {
   pkgs,
   inputs,
+  lib,
+  config,
   ...
-}: {
+}: let
+  # DEVMODE/FAST ITERATION
+  devMode = false;
+  devPath = "/home/jan/devenv/impure/hypr";
+
+  makeScreenshotScript = pkgs.writeShellScriptBin "make-screenshot" ''
+    mkdir -p "$HOME/Pictures/Screenshots/$(date +%F)"
+
+    find "$HOME/Pictures/Screenshots/$(date +%F)" -maxdepth 1 -type f -name 'Screenshot-*-*.png' -printf '%f\n' 2>/dev/null \
+      | awk -F'-' 'match($2,/^[0-9]+$/){print $0"\t"$2}' \
+      | sort -k2,2nr \
+      | cut -f1 \
+      | while IFS= read -r name; do
+          mv -- "$HOME/Pictures/Screenshots/$(date +%F)/$name" \
+                "$HOME/Pictures/Screenshots/$(date +%F)/Screenshot-$(printf '%03d' $((10#$(echo "$name" | cut -d- -f2)+1)))-$(echo "$name" | cut -d- -f3-)"
+        done
+
+    grim -g "$(slurp -d)" - \
+      | tee "$HOME/Pictures/Screenshots/$(date +%F)/Screenshot-000-$(date +%H%M-%m-%d-%y).png" \
+      | wl-copy
+  '';
+
+  quickdrawScreenshotScript = pkgs.writeShellScriptBin "quickdraw-screenshot" ''
+    if [ -d $HOME/Pictures/Screenshots/$(date +%F) ] && [ `ls -1 $HOME/Pictures/Screenshots/$(date +%F)/Screenshot* 2>/dev/null | wc -l` -gt 0 ]; then
+      ripdrag -a -b -W 800 -H 620 -s 200 $HOME/Pictures/Screenshots/$(date +%F)/Screenshot*
+    else
+      notify-send "No screenshots in $(date +%F) yet." --app-name="RipDrag"
+    fi
+  '';
+in {
   imports = [./plugins];
-  home.packages = with pkgs; [
-    wl-clipboard
-    rofi-wayland
+  home = {
+    packages = with pkgs; [
+      wl-clipboard
+      rofi-wayland
 
-    # File Manager
-    xfce.thunar
-    xfce.thunar-volman
-    xfce.xfconf
-    xfce.tumbler
-    xfce.thunar-archive-plugin
+      # File Manager
+      xfce.thunar
+      xfce.thunar-volman
+      xfce.xfconf
+      xfce.tumbler
+      xfce.thunar-archive-plugin
 
-    # Volume and Brightness Util
-    brightnessctl
-    playerctl
+      # Volume and Brightness Util
+      brightnessctl
+      playerctl
 
-    # Icons and Cursors
-    nordic
-    nordzy-icon-theme
-    bibata-cursors
+      # Icons and Cursors
+      nordic
+      nordzy-icon-theme
+      bibata-cursors
 
-    # QT Compatibility
-    qt6.full
-    inputs.quickshell.packages.x86_64-linux.default
-  ];
-
+      # QT Compatibility
+      qt6.full
+      inputs.quickshell.packages.x86_64-linux.default
+    ];
+  };
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;
@@ -38,7 +70,7 @@
       pkgs.hyprlandPlugins.hy3
     ];
 
-    settings = {
+    settings = lib.mkIf (!devMode) {
       ##################
       # CONF VARIABLES #
       ##################
@@ -51,7 +83,6 @@
       # STARTUP EXECUTIONS #
       ######################
       exec-once = [
-        "hyprlock"
         "hypridle"
         "[workspace special silent] vesktop"
         "[workspace special silent] obsidian"
@@ -87,9 +118,9 @@
         "opacity 1.0 override, class:(Turing Complete)"
         "opacity 1.0 override, title:(ZenlessZoneZero)"
         "opacity 1.0 override, class:(.*Minecraft.*)"
-        "opacity 0.7 override, class:(kitty)"
         "opacity 1.0 override, title:(Lilith's Throne 0.4.11.3 Alpha)"
         "opacity 1.0 override, class:(jam-app)"
+        "opacity 1.0 override, class:(winboat)"
         "noanim, title:^(ueberzugpp_.*)$"
       ];
 
@@ -101,15 +132,15 @@
         "$MOD SHIFT, Q, killactive"
         "$MOD CTRL, Q, exit"
         "$MOD, W, exec, $browser"
-        "$MOD SHIFT, S, exec, grim -g \"$(slurp -d)\" - | wl-copy"
-        "$MOD, E, exec, thunar"
+        "$MOD SHIFT, S, exec, ${makeScreenshotScript}/bin/make-screenshot"
+        "$MOD CTRL, S, exec, ${quickdrawScreenshotScript}/bin/quickdraw-screenshot"
+        "$MOD, E, exec, y"
         "$MOD, C, togglefloating,"
         "$MOD, C, centerwindow,"
         "$MOD, F, fullscreen, 0"
         "$MOD SHIFT, F, fullscreen, 1"
         "$MOD, R, exec, rofi -show drun"
         "$MOD, X, togglespecialworkspace"
-        "$MOD, M, exec, hyprlock"
 
         "$MOD, H, hy3:movefocus, l"
         "$MOD, J, hy3:movefocus, d"
@@ -178,9 +209,9 @@
       ];
 
       general = {
-        border_size = "1";
-        gaps_in = "3";
-        gaps_out = "5";
+        border_size = "5";
+        gaps_in = "10";
+        gaps_out = "20";
         layout = "hy3";
       };
 
@@ -199,12 +230,18 @@
 
       decoration = {
         rounding = "10";
-        active_opacity = "0.875";
-        inactive_opacity = "0.875";
+        active_opacity = "0.8";
+        inactive_opacity = "0.8";
         fullscreen_opacity = "1";
         blur = {
-          size = "6";
-          passes = "2";
+          enabled = true;
+          size = 7;
+          passes = 3;
+          ignore_opacity = true;
+          noise = 0.08;
+          contrast = 1.5;
+          xray = false;
+          new_optimizations = true;
         };
       };
 
@@ -253,5 +290,8 @@
         };
       };
     };
+    extraConfig = lib.optionalString devMode ''
+      source=${devPath}/hyprland.conf
+    '';
   };
 }

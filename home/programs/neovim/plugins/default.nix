@@ -29,6 +29,8 @@
 
       nvim-autopairs.enable = true;
 
+      nvim-surround.enable = true;
+
       colorizer = {
         enable = true;
       };

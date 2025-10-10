@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  inputs,
   secrets,
   ...
 }: {
@@ -10,6 +11,7 @@
     ./swayosd
     ./swaync
     ./rmpc
+    ./starship
   ];
 
   home.packages = with pkgs; [
@@ -41,12 +43,14 @@
     ouch
     exiftool
     kdePackages.okular
+    ripdrag
   ];
 
   programs = {
     yazi = {
       enable = true;
       enableZshIntegration = true;
+      package = inputs.yazi.packages.${pkgs.system}.yazi;
       plugins = {
         inherit (pkgs.yaziPlugins) ouch;
       };
@@ -57,12 +61,19 @@
             on = ["C"];
             desc = "Compress with ouch";
           }
+          {
+            run = ''
+              shell -- if [ $# -eq 1 ]; then
+                ripdrag -i -x -W 256 -H 256 -s 250 "$1"
+              else
+                ripdrag -a -W 500 -H 500 -s 100 "$@"
+              fi
+            '';
+            on = ["<C-d>"];
+          }
         ];
       };
       settings = {
-        preview = {
-          ueberzug_offset = [1.5 1.5 2 2];
-        };
         opener = {
           extract = [
             {
@@ -144,11 +155,9 @@
         scrollback_lines = 10000;
         update_check_interval = 0;
         confirm_os_window_close = 0;
-        font_size = 16;
+        font_size = 20;
       };
     };
-
-    starship.enable = true;
 
     zsh = {
       enable = true;
@@ -167,8 +176,19 @@
             rm -f -- "$tmp"
           }
         '';
+
+        exportStarshipDuration = lib.mkOrder 2000 ''
+          autoload -Uz add-zsh-hook
+          _export_starship_duration() {
+            # If Starship set a duration for the last command, export it
+            if [[ -n "$STARSHIP_DURATION" ]]; then
+              export STARSHIP_DURATION
+            fi
+          }
+          add-zsh-hook precmd _export_starship_duration
+        '';
       in
-        lib.mkMerge [zshConfigEarlyInit zshConfig];
+        lib.mkMerge [zshConfigEarlyInit zshConfig exportStarshipDuration];
 
       shellAliases = {
         nrs = "sudo nixos-rebuild switch --flake /home/jan/nixos-config/";

@@ -16,11 +16,18 @@
       # Cachix settings for Hyprland
       substituters = [
         "https://hyprland.cachix.org"
+        "https://yazi.cachix.org"
+      ];
+      trusted-substituters = [
+        "https://hyprland.cachix.org"
+        "https://yazi.cachix.org"
       ];
       trusted-public-keys = [
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+        "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       ];
-
+      extra-substituters = [ "https://yazi.cachix.org" ];
+      extra-trusted-public-keys = [ "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" ];
       # Regularly cleans and checks store dir
       auto-optimise-store = true;
 
@@ -229,7 +236,7 @@
       isNormalUser = true;
       description = "Jan Kaltenegger";
       extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker"];
-      packages = [ inputs.zen-browser.packages."${system}".default ];
+      packages = [inputs.zen-browser.packages."${system}".default];
       initialHashedPassword = "$6$a0APTJTEwx2F3sS4$OjD4KqoqZkmhHstu7aK545Gm/y.tRN4Ykj.mHr5PODRlej/v6Zb4M19NdvTk2BNV0xv7ROQV1gfcWeC6lZ8u//";
     };
   };
@@ -274,11 +281,13 @@
 
     systemPackages =
       [
+        inputs.winboat.packages.${pkgs.system}.winboat
         inputs.zen-browser.packages.${pkgs.system}.default
       ]
       ++ (with pkgs; [
         _1password-gui
         _1password-cli
+        freerdp
         ueberzugpp
         fwupd
         swayosd
@@ -323,11 +332,9 @@
   fonts.packages = with pkgs; [
     vistafonts
     corefonts
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.iosevka
-    nerd-fonts.roboto-mono
-    nerd-fonts.hack
-    nerd-fonts.terminess-ttf
+    nerd-fonts.atkynson-mono
+    roboto
+    noto-fonts
   ];
 
   virtualisation.docker.enable = true;
@@ -344,6 +351,20 @@
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
       size = 48;
+    };
+    fonts = {
+      monospace = {
+        name = "AtkynsonMono Nerd Font";
+        package = pkgs.nerd-fonts.atkynson-mono;
+      };
+      serif = {
+        name = "Roboto";
+        package = pkgs.roboto;
+      };
+      sansSerif = {
+        name = "Roboto";
+        package = pkgs.roboto;
+      };
     };
   };
 

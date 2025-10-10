@@ -46,6 +46,12 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
+    yazi.url = "github:sxyazi/yazi";
+
+    winboat = {
+      url = "github:TibixDev/winboat";
+    };
   };
 
   outputs = inputs:
