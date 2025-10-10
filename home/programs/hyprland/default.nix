@@ -87,7 +87,6 @@ in {
         "[workspace special silent] vesktop"
         "[workspace special silent] obsidian"
         "[workspace special silent] telegram-desktop"
-        "sleep 5; swayosd-server"
       ];
 
       ############

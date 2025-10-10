@@ -158,7 +158,7 @@
       enable = true;
       settings = rec {
         initial_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
+          command = "${inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland}/bin/Hyprland";
           user = "jan";
         };
         default_session = initial_session;
