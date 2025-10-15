@@ -1,22 +1,23 @@
 {
   imports = [
     ./lsp.nix
-    ./startify.nix
     ./treesitter.nix
-    ./floaterm.nix
     ./lualine.nix
-    ./telescope.nix
-    ./fidget.nix
     ./none-ls.nix
     ./nvim-notify.nix
     ./hardtime.nix
     ./flash.nix
     ./trouble.nix
     ./snacks.nix
+    ./noice.nix
+    ./yazi-nvim.nix
+    ./which-key.nix
   ];
 
   programs.nixvim = {
     plugins = {
+      nui.enable = true;
+
       web-devicons.enable = true;
 
       gitsigns = {
@@ -27,9 +28,8 @@
         };
       };
 
-      nvim-autopairs.enable = true;
-
       nvim-surround.enable = true;
+      nvim-autopairs.enable = true;
 
       colorizer = {
         enable = true;
@@ -38,11 +38,7 @@
       trim = {
         enable = true;
         settings = {
-          hightight = true;
-          ft_blocklist = [
-            "floaterm"
-            "TelescopePrompt"
-          ];
+          highlight = true;
         };
       };
     };

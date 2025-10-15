@@ -1,12 +1,20 @@
 {
   programs.nixvim.plugins.snacks = {
     enable = true;
-    luaConfig.post = ''
-      opts = {
-        animate = { enabled = true },
-        bigfile = { enabled = true },
-        dim = { enabled = true },
-      }
-    '';
+    settings = {
+      bigfile = {
+        enabled = true;
+      };
+      indent = {
+        enabled = true;
+        char = "w";
+      };
+      bufdelete = {
+        enabled = true;
+      };
+      picker = {
+        enabled = true;
+      };
+    };
   };
 }

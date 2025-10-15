@@ -7,7 +7,7 @@
   imports = [
     inputs.nixvim.homeModules.nixvim
     ./completion.nix
-    ./keymappings.nix
+    ./keymaps.nix
     ./options.nix
     ./colorscheme.nix
     ./plugins
@@ -25,6 +25,8 @@
     enable = true;
     defaultEditor = true;
 
+    nixpkgs.config.allowUnfree = true;
+
     package = unstable-pkgs.neovim-unwrapped;
 
     performance = {
@@ -39,7 +41,7 @@
         ];
       };
 
-      byteCompileLua.enable = true;
+      byteCompileLua.enable = false;
     };
 
     viAlias = true;
@@ -48,8 +50,16 @@
     luaLoader.enable = true;
 
     extraPlugins = with pkgs.vimPlugins; [
-      vim-suda
-      which-key-nvim
-    ];
+      lush-nvim
+    ] ++ [(pkgs.vimUtils.buildVimPlugin {
+      name = "sidekick-nvim";
+      src = pkgs.fetchFromGitHub {
+        owner = "folke";
+        repo = "sidekick.nvim";
+        rev = "7185e0863ba9f533b39d699243ee65c2f16062af";
+        hash = "sha256-FsRxXWNDNBFMVF4yMPubY0zsk6Cip0Wquq/ql3Y0o88=";
+      };
+      doCheck = false;
+    })];
   };
 }

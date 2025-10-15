@@ -1,8 +1,6 @@
 {
   pkgs,
-  inputs,
   lib,
-  config,
   ...
 }: let
   # DEVMODE/FAST ITERATION
@@ -21,9 +19,23 @@
                 "$HOME/Pictures/Screenshots/$(date +%F)/Screenshot-$(printf '%03d' $((10#$(echo "$name" | cut -d- -f2)+1)))-$(echo "$name" | cut -d- -f3-)"
         done
 
-    grim -g "$(slurp -d)" - \
-      | tee "$HOME/Pictures/Screenshots/$(date +%F)/Screenshot-000-$(date +%H%M-%m-%d-%y).png" \
-      | wl-copy
+    dir="$HOME/Pictures/Screenshots/$(date +%F)"
+    file="$dir/Screenshot-000-$(date +%H%M-%m-%d-%y).png"
+
+    # Capture screenshot to file only
+    if grim -g "$(slurp -d)" "$file"; then
+      # Only copy if the file isn't empty
+      if [ -s "$file" ]; then
+        wl-copy < "$file"
+        notify-send "Screenshot" "Saved and copied: $(basename "$file")"
+      else
+        rm -f "$file"
+        notify-send "Screenshot" "Canceled"
+      fi
+    else
+      rm -f "$file"
+      notify-send "Screenshot" "Canceled (grim failed)"
+    fi
   '';
 
   quickdrawScreenshotScript = pkgs.writeShellScriptBin "quickdraw-screenshot" ''
@@ -33,34 +45,24 @@
       notify-send "No screenshots in $(date +%F) yet." --app-name="RipDrag"
     fi
   '';
+
+  tabSpecialWorkspace = pkgs.writeShellScriptBin "tabspecialworkspace" ''
+    hyprctl keyword plugin:hy3:tab_first_window true
+    vesktop &
+    telegram-desktop &
+    sleep 2
+    telegram=$(hyprctl clients -j | jq '.[] | select(.class=="org.telegram.desktop") | .address' | tr -d '"')
+    hyprctl dispatch focuswindow "address:$telegram"
+    hyprctl dispatch hy3:locktab lock
+    obsidian &
+    sleep 2
+    hyprctl dispatch focuswindow "address:$telegram"
+    hyprctl dispatch hy3:locktab unlock
+    hyprctl keyword plugin:hy3:tab_first_window false
+    hyprctl dispatch togglespecialworkspace
+  '';
 in {
   imports = [./plugins];
-  home = {
-    packages = with pkgs; [
-      wl-clipboard
-      rofi-wayland
-
-      # File Manager
-      xfce.thunar
-      xfce.thunar-volman
-      xfce.xfconf
-      xfce.tumbler
-      xfce.thunar-archive-plugin
-
-      # Volume and Brightness Util
-      brightnessctl
-      playerctl
-
-      # Icons and Cursors
-      nordic
-      nordzy-icon-theme
-      bibata-cursors
-
-      # QT Compatibility
-      qt6.full
-      inputs.quickshell.packages.x86_64-linux.default
-    ];
-  };
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;
@@ -84,9 +86,7 @@ in {
       ######################
       exec-once = [
         "hypridle"
-        "[workspace special silent] vesktop"
-        "[workspace special silent] obsidian"
-        "[workspace special silent] telegram-desktop"
+        "${tabSpecialWorkspace}/bin/tabspecialworkspace"
         "sleep 5; swayosd-server"
       ];
 
@@ -113,15 +113,21 @@ in {
 
       # Zen Browser
       windowrule = [
+        "size 50% 40%, floating: 1"
         "opacity 1.0 override 0.875 override 1.0 override, initialTitle:(Zen Browser)"
-        "workspace special silent, class:(vesktop)"
+        "workspace special silent, class:vesktop"
+        "workspace special silent, title:Telegram"
+        "workspace special silent, class:obsidian"
         "opacity 1.0 override, class:(Turing Complete)"
-        "opacity 1.0 override, title:(ZenlessZoneZero)"
+        "opacity 1.0 override, title:ZenlessZoneZero)"
         "opacity 1.0 override, class:(.*Minecraft.*)"
-        "opacity 1.0 override, title:(Lilith's Throne 0.4.11.3 Alpha)"
-        "opacity 1.0 override, class:(jam-app)"
-        "opacity 1.0 override, class:(winboat)"
+        "opacity 1.0 override, class:jam-app"
+        "opacity 1.0 override, class:winboat"
+        "opacity 1.0 override, class:^(Microsoft.*)$"
         "noanim, title:^(ueberzugpp_.*)$"
+
+        "float, initialTitle:^(rmpc)$, title:^(rmpc)$"
+        "size 25% 42%, initialTitle:^(rmpc)$, title:^(rmpc)$"
       ];
 
       #################
@@ -134,9 +140,9 @@ in {
         "$MOD, W, exec, $browser"
         "$MOD SHIFT, S, exec, ${makeScreenshotScript}/bin/make-screenshot"
         "$MOD CTRL, S, exec, ${quickdrawScreenshotScript}/bin/quickdraw-screenshot"
-        "$MOD, E, exec, y"
-        "$MOD, C, togglefloating,"
-        "$MOD, C, centerwindow,"
+        "$MOD, E, exec, $terminal --title yazi yazi"
+        "$MOD, M, exec, $terminal --title rmpc rmpc"
+        "$MOD, C, exec, hyprctl dispatch togglefloating && if hyprctl activewindow | grep -q \"class: kitty\" && hyprctl activewindow | grep -q \"floating: 1\"; then hyprctl dispatch resizeactive exact 800 600 && hyprctl dispatch centerwindow; fi"
         "$MOD, F, fullscreen, 0"
         "$MOD SHIFT, F, fullscreen, 1"
         "$MOD, R, exec, rofi -show drun"
