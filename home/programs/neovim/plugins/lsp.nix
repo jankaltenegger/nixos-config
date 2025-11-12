@@ -47,12 +47,21 @@
       jdtls = {
         enable = true;
         luaConfig.pre = ''
-          local jdtls = require('jdtls')
-          local root_dir = require('jdtls.setup').find_root({ 'pom.xml', 'mvnw', 'gradlew', '.git' })
-          if not root_dir or root_dir == "" then return end
-
-          local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
-          local workspace_dir = vim.fn.stdpath('data') .. '/jdtls-workspaces/' .. project_name
+          do
+            local jdtls = require("jdtls")
+            local root_dir = require("jdtls.setup").find_root({ "pom.xml", "mvnw", "gradlew", ".git" })
+            if root_dir and root_dir ~= "" then
+              local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
+              local workspace_dir = vim.fn.stdpath("data") .. "/jdtls-workspaces/" .. project_name
+              -- Start or attach JDTLS only if inside a valid project
+              vim.api.nvim_create_autocmd("FileType", {
+                pattern = "java",
+                callback = function()
+                  jdtls.start_or_attach({ cmd = { "jdtls", "-data", workspace_dir }, root_dir = root_dir })
+                end,
+              })
+            end
+          end
         '';
 
         settings = {

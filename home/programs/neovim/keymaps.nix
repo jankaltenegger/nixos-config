@@ -32,10 +32,6 @@
         maps;
 
       general = mkList {
-        "<Space>" = {
-          action = "<NOP>";
-        };
-
         "<esc>" = {
           action = ":noh<cr>";
           desc = "Clear search highlight";
@@ -80,6 +76,11 @@
           mode = ["v" "x"];
           action = ":m '>+1<cr>gv=gv";
           desc = "Move block down";
+        };
+
+        "<leader>ca" = {
+          action.__raw = "function() vim.lsp.buf.code_action() end";
+          desc = "Show code actions";
         };
       };
 
@@ -367,7 +368,19 @@
       trouble = mkList {
         "<leader>xx" = {
           action = "<cmd>Trouble diagnostics toggle<cr>";
-          desc = "Diagnostics (Trouble)";
+          desc = "Diagnostics";
+        };
+        "<leader>xQ" = {
+          action = "<cmd>Trouble qflist toggle<cr>";
+          desc = "Quickfix List";
+        };
+        "<leader>xL" = {
+          action = "<cmd>Trouble loclist toggle<cr>";
+          desc = "Location List";
+        };
+        "<leader>xd" = {
+          action = "<cmd>Trouble lsp toggle focus = false win.position=right<cr>";
+          desc = "LSP Definitions / references / ...";
         };
       };
 

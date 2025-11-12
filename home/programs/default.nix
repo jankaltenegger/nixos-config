@@ -1,5 +1,6 @@
 {
   pkgs,
+  unstable-pkgs,
   lib,
   inputs,
   secrets,
@@ -16,51 +17,59 @@
     ./yazi
   ];
 
-  home.packages = with pkgs; [
-    prismlauncher #Minecraft 3rdP launcher
-    tdesktop # Messaging App
-    httpie # CLI ARC/Postman Solution
-    grim # For ScreenShots
-    slurp # For Screenshots
-    obsidian # Note-taking Software
-    calibre # Book Management Software
-    clapper # Video Viewer
-    gthumb # Media Viwer
-    devenv # Development environments made easy
-    mullvad-vpn # VPN
-    vesktop
-    cozy #Audiobook player
-    geckodriver
-    gnome-disk-utility
-    heroic
-    bottles
-    mangohud
-    transmission_4-gtk
-    bluetui
-    docker
-    zap
-    spotify
-    ouch
-    exiftool
-    kdePackages.okular
-    ripdrag
+  home.packages = with pkgs;
+    [
+      prismlauncher #Minecraft 3rdP launcher
+      tdesktop # Messaging App
+      httpie # CLI ARC/Postman Solution
+      grim # For ScreenShots
+      slurp # For Screenshots
+      obsidian # Note-taking Software
+      calibre # Book Management Software
+      clapper # Video Viewer
+      gthumb # Media Viwer
+      devenv # Development environments made easy
+      mullvad-vpn # VPN
+      vesktop
+      cozy #Audiobook player
+      geckodriver
+      gnome-disk-utility
+      heroic
+      bottles
+      mangohud
+      transmission_4-gtk
+      bluetui
+      docker
+      zap
+      spotify
+      ouch
+      exiftool
+      kdePackages.okular
+      ripdrag
 
-    wl-clipboard
-    rofi-wayland
+      wl-clipboard
+      rofi-wayland
 
-    # Volume and Brightness Util
-    brightnessctl
-    playerctl
+      # Volume and Brightness Util
+      brightnessctl
+      playerctl
 
-    # Icons and Cursors
-    nordic
-    nordzy-icon-theme
-    bibata-cursors
+      # Icons and Cursors
+      nordic
+      nordzy-icon-theme
+      bibata-cursors
 
-    # QT Compatibility
-    qt6.full
-    inputs.quickshell.packages.x86_64-linux.default
-  ];
+      # QT Compatibility
+      qt6.full
+      inputs.quickshell.packages.x86_64-linux.default
+
+      kicad
+
+      libreoffice-qt6-fresh
+    ]
+    ++ (with unstable-pkgs; [
+      secretspec
+    ]);
 
   programs = {
     zellij = {

@@ -34,14 +34,32 @@
         enable = false;
         standalonePlugins = [
           "nvim-treesitter"
-          "nord.nvim"
+          "nvim-jdtls"
+
+          "nvim-dap"
+          "conform-nvim"
+          "lualine.nvim"
+          "flash.nvim"
+          "noice.nvim"
+          "nvim-notify"
+          "snacks.nvim"
+          "trouble.nvim"
+          "which-key.nvim"
+          "yazi.nvim"
+          "vim-wakatime"
+          "none-ls.nvim"
+          "nui.nvim"
+          "nvim-surround"
+          "nvim-autopairs"
+          "lush-nvim"
+          "friendly-snippets"
         ];
         pathsToLink = [
           "./doc/tags"
         ];
       };
 
-      byteCompileLua.enable = false;
+      byteCompileLua.enable = true;
     };
 
     viAlias = true;
@@ -51,15 +69,6 @@
 
     extraPlugins = with pkgs.vimPlugins; [
       lush-nvim
-    ] ++ [(pkgs.vimUtils.buildVimPlugin {
-      name = "sidekick-nvim";
-      src = pkgs.fetchFromGitHub {
-        owner = "folke";
-        repo = "sidekick.nvim";
-        rev = "7185e0863ba9f533b39d699243ee65c2f16062af";
-        hash = "sha256-FsRxXWNDNBFMVF4yMPubY0zsk6Cip0Wquq/ql3Y0o88=";
-      };
-      doCheck = false;
-    })];
+    ];
   };
 }

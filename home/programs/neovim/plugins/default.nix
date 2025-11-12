@@ -12,6 +12,7 @@
     ./noice.nix
     ./yazi-nvim.nix
     ./which-key.nix
+    ./wakatime.nix
   ];
 
   programs.nixvim = {

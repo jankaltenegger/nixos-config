@@ -136,7 +136,6 @@ in {
       bind = [
         "$MOD, Return, exec, $terminal"
         "$MOD SHIFT, Q, killactive"
-        "$MOD CTRL, Q, exit"
         "$MOD, W, exec, $browser"
         "$MOD SHIFT, S, exec, ${makeScreenshotScript}/bin/make-screenshot"
         "$MOD CTRL, S, exec, ${quickdrawScreenshotScript}/bin/quickdraw-screenshot"

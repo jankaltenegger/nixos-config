@@ -10,6 +10,7 @@
   myPackages = with pkgs; [
     any-nix-shell #zsh support for nix shell
     gammastep # F.LUX FOR LINUX???
+    geoclue2
     eza # ls replacement
     fd # find replacement
     libnotify # notify-send command (no clue what this does)

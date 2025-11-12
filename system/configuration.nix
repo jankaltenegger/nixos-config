@@ -313,6 +313,7 @@
         ssh-to-age
         git-crypt
         gvfs
+        geckodriver
       ]);
 
     sessionVariables = {
