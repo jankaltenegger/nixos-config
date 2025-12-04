@@ -7,6 +7,7 @@
       "/etc/ssh"
 
       "/var/lib/nixos"
+      "/var/lib/docker"
       "/var/lib/systemd/coredump"
       "/etc/NetworkManager/system-connections"
     ];
@@ -42,6 +43,10 @@
 
         # Fastfetch (faster loading)
         ".cache/fastfetch"
+
+        # Steam
+        ".local/share/Steam"
+        ".config/unity3d"
 
         # User Folders
         "devenv"

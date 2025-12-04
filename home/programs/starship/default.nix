@@ -2,14 +2,12 @@
   lib,
   config,
   ...
-}: let
-  devMode = false;
-  devPath = "/home/jan/devenv/impure/starship/starship.toml";
-in {
+}:
+{
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    settings = lib.mkIf (!devMode) {
+    settings = {
       palette = "nord";
       add_newline = true;
       format = lib.concatStrings [
@@ -379,11 +377,5 @@ in {
         };
       };
     };
-  };
-
-  xdg.configFile."starship.toml".enable = lib.mkForce (!devMode);
-  home.file.".config/starship.toml" = lib.mkIf devMode {
-    source = config.lib.file.mkOutOfStoreSymlink devPath;
-    force = true;
   };
 }

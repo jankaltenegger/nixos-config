@@ -1,6 +1,7 @@
 {
   pkgs,
   unstable-pkgs,
+  unstable-small-pkgs,
   lib,
   inputs,
   secrets,
@@ -19,8 +20,9 @@
 
   home.packages = with pkgs;
     [
+      protonup-qt
       prismlauncher #Minecraft 3rdP launcher
-      tdesktop # Messaging App
+      telegram-desktop # Messaging App
       httpie # CLI ARC/Postman Solution
       grim # For ScreenShots
       slurp # For Screenshots
@@ -45,10 +47,9 @@
       ouch
       exiftool
       kdePackages.okular
-      ripdrag
 
       wl-clipboard
-      rofi-wayland
+      rofi
 
       # Volume and Brightness Util
       brightnessctl
@@ -60,15 +61,15 @@
       bibata-cursors
 
       # QT Compatibility
-      qt6.full
+      hyprland-qt-support
       inputs.quickshell.packages.x86_64-linux.default
 
-      kicad
-
       libreoffice-qt6-fresh
+      rimsort
     ]
     ++ (with unstable-pkgs; [
       secretspec
+      winboat
     ]);
 
   programs = {

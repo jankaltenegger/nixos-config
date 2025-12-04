@@ -11,10 +11,19 @@
   overlays = (import ../overlays).nixpkgs.overlays;
   pkgs = import inputs.nixpkgs {
     inherit system overlays;
-    config.allowUnfree = true;
+    config = {
+      allowUnfree = true;
+      rocmSupport = true;
+    };
   };
 
   unstable-pkgs = import inputs.nixpkgs-unstable {
+    inherit system inputs;
+    config.allowUnfree = true;
+  };
+
+
+  unstable-small-pkgs = import inputs.nixpkgs-unstable {
     inherit system inputs;
     config.allowUnfree = true;
   };
@@ -22,7 +31,7 @@ in {
   ymir = nixosSystem {
     inherit lib pkgs system;
 
-    specialArgs = {inherit unstable-pkgs system secrets inputs;};
+    specialArgs = {inherit unstable-small-pkgs unstable-pkgs system secrets inputs;};
 
     modules = [
       ../system/configuration.nix
@@ -34,7 +43,7 @@ in {
 
       {
         home-manager = {
-          extraSpecialArgs = {inherit inputs secrets unstable-pkgs;};
+          extraSpecialArgs = {inherit inputs secrets unstable-pkgs unstable-small-pkgs;};
           useGlobalPkgs = true;
           useUserPackages = true;
           users.jan = import ../home/home.nix;

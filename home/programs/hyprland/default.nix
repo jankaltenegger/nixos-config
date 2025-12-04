@@ -105,6 +105,7 @@ in {
         "XCURSOR_SIZE,24"
         "XCURSOR_THEME,Bibata-Modern-Ice"
         "AQ_DRM_DEVICES,/dev/dri/card0:/dev/dri/card1"
+        "WLR_DRM_NO_ATOMIC,1"
       ];
 
       ################
@@ -113,7 +114,7 @@ in {
 
       # Zen Browser
       windowrule = [
-        "size 50% 40%, floating: 1"
+        #"size 50% 40%, floating: 1"
         "opacity 1.0 override 0.875 override 1.0 override, initialTitle:(Zen Browser)"
         "workspace special silent, class:vesktop"
         "workspace special silent, title:Telegram"
@@ -128,6 +129,17 @@ in {
 
         "float, initialTitle:^(rmpc)$, title:^(rmpc)$"
         "size 25% 42%, initialTitle:^(rmpc)$, title:^(rmpc)$"
+
+        # --- Gamescope Rules ---
+        "noblur, class:^(gamescope)$"
+        "noshadow, class:^(gamescope)$"
+        "noanim, class:^(gamescope)$"
+        "rounding 0, class:^(gamescope)$"
+
+        "fullscreen, class:^(gamescope)$"
+        "monitor 0, class:^(gamescope)$"
+
+        "immediate, class:^(gamescope)$"
       ];
 
       #################
@@ -218,6 +230,7 @@ in {
         gaps_in = "10";
         gaps_out = "20";
         layout = "hy3";
+        allow_tearing = true;
       };
 
       animations = {
@@ -261,12 +274,6 @@ in {
           natural_scroll = "true";
           scroll_factor = "0.8";
         };
-      };
-
-      gestures = {
-        workspace_swipe = "true";
-        workspace_swipe_distance = "200";
-        workspace_swipe_cancel_ratio = "0.35";
       };
 
       misc = {

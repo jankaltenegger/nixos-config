@@ -115,11 +115,6 @@
     amdgpu = {
       opencl.enable = true;
       initrd.enable = true;
-      amdvlk = {
-        enable = true;
-        supportExperimental.enable = true;
-        support32Bit.enable = true;
-      };
     };
 
     bluetooth = {
@@ -281,7 +276,6 @@
 
     systemPackages =
       [
-        inputs.winboat.packages.${pkgs.system}.winboat
         inputs.zen-browser.packages.${pkgs.system}.default
       ]
       ++ (with pkgs; [
@@ -302,8 +296,6 @@
         fusee-nano
         zip
         unzip
-        amdvlk
-        driversi686Linux.amdvlk
         mesa
         driversi686Linux.mesa
         amdgpu_top
@@ -331,7 +323,7 @@
   users.extraGroups.vboxusers.members = ["jan"];
 
   fonts.packages = with pkgs; [
-    vistafonts
+    vista-fonts
     corefonts
     nerd-fonts.atkynson-mono
     roboto
