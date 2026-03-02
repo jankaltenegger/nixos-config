@@ -87,7 +87,7 @@ in {
       exec-once = [
         "hypridle"
         "${tabSpecialWorkspace}/bin/tabspecialworkspace"
-        "sleep 5; swayosd-server"
+        "swayosd-server"
       ];
 
       ############
@@ -116,15 +116,14 @@ in {
       windowrule = [
         #"size 50% 40%, floating: 1"
         "opacity 1.0 override 0.875 override 1.0 override, initialTitle:(Zen Browser)"
+        "opacity 1.0 override 0.875 override 1.0 override, class:com.github.xournalpp.xournalpp"
         "workspace special silent, class:vesktop"
         "workspace special silent, title:Telegram"
         "workspace special silent, class:obsidian"
-        "opacity 1.0 override, class:(Turing Complete)"
-        "opacity 1.0 override, title:ZenlessZoneZero)"
         "opacity 1.0 override, class:(.*Minecraft.*)"
-        "opacity 1.0 override, class:jam-app"
-        "opacity 1.0 override, class:winboat"
         "opacity 1.0 override, class:^(Microsoft.*)$"
+        "opacity 1.0 override, class:gimp"
+        "opacity 1.0 override, class:Code"
         "noanim, title:^(ueberzugpp_.*)$"
 
         "float, initialTitle:^(rmpc)$, title:^(rmpc)$"

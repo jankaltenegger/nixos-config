@@ -26,8 +26,8 @@
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       ];
-      extra-substituters = [ "https://yazi.cachix.org" ];
-      extra-trusted-public-keys = [ "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" ];
+      extra-substituters = ["https://yazi.cachix.org"];
+      extra-trusted-public-keys = ["yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="];
       # Regularly cleans and checks store dir
       auto-optimise-store = true;
 
@@ -53,22 +53,30 @@
 
   # For the love of fucking god do not touch shit below this
   boot = {
+    kernelParams = ["ipv6.disable=1"];
     loader = {
       efi = {
-        canTouchEfiVariables = true;
         efiSysMountPoint = "/boot/efi";
       };
 
       grub = {
         enable = true;
         efiSupport = true;
+        efiInstallAsRemovable = true;
         device = "nodev";
         enableCryptodisk = true;
         copyKernels = true;
       };
     };
 
+    kernel.sysctl = {
+      "net.core.default_qdisc" = "fq";
+      "net.ipv4.tcp_congestion_control" = "bbr";
+      "net.ipv4.tcp_fastopen" = 3;
+    };
+
     extraModprobeConfig = ''
+      options r8152 autosuspend=N enable_aspm=N enable_eee=N
       options snd-hda-intel model=dell-headset-multi
     '';
   }; # You're good to touch shit again
@@ -117,6 +125,11 @@
       initrd.enable = true;
     };
 
+    opentabletdriver.enable = true;
+    opentabletdriver.blacklistedKernelModules = [ "wacom" "hid_uclogic" ];
+
+    saleae-logic.enable = true;
+
     bluetooth = {
       enable = true;
       package = unstable-pkgs.bluez;
@@ -130,6 +143,23 @@
   };
 
   services = {
+    gvfs.enable = true;
+
+    radicale = {
+      enable = true;
+      settings = {
+        server.hosts = ["0.0.0.0:5232"];
+        auth = {
+          type = "htpasswd";
+          htpasswd_filename = "/var/lib/radicale/users";
+          htpasswd_encryption = "bcrypt";
+        };
+        storage = {
+          filesystem_folder = "/var/lib/radicale/collections";
+        };
+      };
+    };
+
     openssh.enable = true;
 
     xserver.videoDrivers = ["amdgpu" "modesetting"];
@@ -137,7 +167,6 @@
 
     printing.enable = true;
     printing.drivers = [pkgs.cups-dymo];
-
     avahi = {
       enable = true;
       nssmdns4 = true;
@@ -159,10 +188,6 @@
         default_session = initial_session;
       };
     };
-
-    # Thunar Stuff
-    gvfs.enable = true;
-    tumbler.enable = true;
 
     pipewire = {
       enable = true;
@@ -199,11 +224,17 @@
   networking = {
     hostName = "ymir";
 
-    networkmanager.enable = true; # Easiest to use and most distros use this by default.
+    networkmanager = {
+      enable = true;
+      dns = "none";
+    };
+    interfaces.eth0.mtu = 1472;
+    nameservers = ["1.1.1.1" "8.8.8.8"];
+    enableIPv6 = false;
 
     nftables.enable = true;
 
-    firewall.allowedTCPPorts = [22 80 443];
+    firewall.allowedTCPPorts = [22 80 443 5232];
   };
 
   # Set your time zone.
@@ -230,7 +261,7 @@
     users.jan = {
       isNormalUser = true;
       description = "Jan Kaltenegger";
-      extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker"];
+      extraGroups = ["kvm" "gamemode" "wheel" "networkmanager" "docker" "dialout"];
       packages = [inputs.zen-browser.packages."${system}".default];
       initialHashedPassword = "$6$a0APTJTEwx2F3sS4$OjD4KqoqZkmhHstu7aK545Gm/y.tRN4Ykj.mHr5PODRlej/v6Zb4M19NdvTk2BNV0xv7ROQV1gfcWeC6lZ8u//";
     };
@@ -306,6 +337,11 @@
         git-crypt
         gvfs
         geckodriver
+        android-tools
+        keychain
+        bashInteractive
+
+        python315
       ]);
 
     sessionVariables = {
@@ -317,7 +353,6 @@
   # Enabling and config for pipewire and wireplumber
   security = {
     rtkit.enable = true;
-    pam.services.hyprlock = {};
   };
 
   users.extraGroups.vboxusers.members = ["jan"];

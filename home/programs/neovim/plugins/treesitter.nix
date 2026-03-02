@@ -15,10 +15,10 @@
 
     treesitter-refactor = {
       enable = true;
-      highlightDefinitions = {
+      highlight_definitions = {
         enable = true;
         # Set to false if you have an `updatetime` of ~100.
-        clearOnCursorMove = false;
+        clear_on_cursor_move = false;
       };
     };
 

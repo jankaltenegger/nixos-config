@@ -16,6 +16,7 @@
     ./starship
     ./zsh
     ./yazi
+    ./configs
   ];
 
   home.packages = with pkgs;
@@ -47,7 +48,7 @@
       ouch
       exiftool
       kdePackages.okular
-
+      brave
       wl-clipboard
       rofi
 
@@ -66,10 +67,26 @@
 
       libreoffice-qt6-fresh
       rimsort
+
+      gimp
+      kdePackages.okular
+
+      obs-studio
+      jetbrains.idea-community
+      vscode
+      jdk25_headless
+      maven
+      arduino-language-server
+      arduino-cli
+      arduino-ide
+
+      saleae-logic-2
+      xournalpp
     ]
     ++ (with unstable-pkgs; [
       secretspec
       winboat
+      github-copilot-cli
     ]);
 
   programs = {
@@ -112,8 +129,10 @@
 
     git = {
       enable = true;
-      userName = "jankaltenegger";
-      userEmail = "jkaltenegger@ggc.edu";
+      settings.user = {
+        name = "jankaltenegger";
+        email = "jkaltenegger@ggc.edu";
+      };
       #extraConfig = {
       #  user.email = "${secrets.github.email}";
       #};

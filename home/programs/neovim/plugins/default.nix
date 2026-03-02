@@ -13,6 +13,7 @@
     ./yazi-nvim.nix
     ./which-key.nix
     ./wakatime.nix
+    ./copilot.nix
   ];
 
   programs.nixvim = {

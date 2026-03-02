@@ -1,5 +1,5 @@
 {
   programs.nixvim.plugins.wakatime = {
-    enable = true;
+    enable = false;
   };
 }
