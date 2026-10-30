@@ -54,6 +54,7 @@
     device = "/dev/disk/by-uuid/82c100e9-f324-456e-b1bd-dde09d81e63f";
     fsType = "btrfs";
     options = ["subvol=home" "compress=zstd" "noatime"];
+    neededForBoot = true;
   };
 
   fileSystems."/boot/efi" = {

@@ -27,8 +27,6 @@
 
     nixpkgs.config.allowUnfree = true;
 
-    package = unstable-pkgs.neovim-unwrapped;
-
     performance = {
       combinePlugins = {
         enable = false;

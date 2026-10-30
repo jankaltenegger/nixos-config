@@ -6,35 +6,28 @@
 }: let
   inherit (inputs.nixpkgs.lib) nixosSystem;
 
-  lib = inputs.nixpkgs.lib;
-
-  overlays = (import ../overlays).nixpkgs.overlays;
-  pkgs = import inputs.nixpkgs {
-    inherit system overlays;
-    config = {
-      allowUnfree = true;
-      rocmSupport = true;
-    };
-  };
-
   unstable-pkgs = import inputs.nixpkgs-unstable {
-    inherit system inputs;
+    inherit system;
     config.allowUnfree = true;
   };
 
-
-  unstable-small-pkgs = import inputs.nixpkgs-unstable {
-    inherit system inputs;
-    config.allowUnfree = true;
-  };
 in {
   ymir = nixosSystem {
-    inherit lib pkgs system;
-
-    specialArgs = {inherit unstable-small-pkgs unstable-pkgs system secrets inputs;};
+    specialArgs = {inherit unstable-pkgs system secrets inputs;};
 
     modules = [
       ../system/configuration.nix
+
+      {
+        nixpkgs = {
+          hostPlatform = system;
+          config = {
+            allowUnfree = true;
+            rocmSupport = true;
+          };
+          overlays = (import ../overlays).nixpkgs.overlays;
+        };
+      }
 
       inputs.impermanence.nixosModules.impermanence
       inputs.home-manager.nixosModules.home-manager
@@ -43,7 +36,7 @@ in {
 
       {
         home-manager = {
-          extraSpecialArgs = {inherit inputs secrets unstable-pkgs unstable-small-pkgs;};
+          extraSpecialArgs = {inherit inputs secrets unstable-pkgs;};
           useGlobalPkgs = true;
           useUserPackages = true;
           users.jan = import ../home/home.nix;

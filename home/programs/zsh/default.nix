@@ -4,7 +4,7 @@
     enableCompletion = true;
     initContent = let
       zshConfigEarlyInit = lib.mkOrder 500 ''
-        eval "$(direnv hook zsh)"
+        eval "$(devenv hook zsh)"
         fastfetch
       '';
       zshConfig = lib.mkOrder 1000 ''
@@ -14,6 +14,7 @@
           IFS= read -r -d "" cwd < "$tmp"
           [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
           rm -f -- "$tmp"
+          [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
         }
       '';
 
@@ -35,6 +36,7 @@
       nrsc = "git add -A && sudo nixos-rebuild switch --flake /home/jan/nixos-config/ && git commit";
       findimp = "sudo fd --one-file-system --base-directory / --type f --hidden --exclude '{tmp,etc/passwd,home/jan/.cache/nvim}'";
       ls = "eza --icons";
+      reboot-to-windows = "sudo efibootmgr --bootnext 0001 && sudo reboot";
     };
 
     syntaxHighlighting = {

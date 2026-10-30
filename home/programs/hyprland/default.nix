@@ -45,264 +45,203 @@
       notify-send "No screenshots in $(date +%F) yet." --app-name="RipDrag"
     fi
   '';
-
-  tabSpecialWorkspace = pkgs.writeShellScriptBin "tabspecialworkspace" ''
-    hyprctl keyword plugin:hy3:tab_first_window true
-    vesktop &
-    telegram-desktop &
-    sleep 2
-    telegram=$(hyprctl clients -j | jq '.[] | select(.class=="org.telegram.desktop") | .address' | tr -d '"')
-    hyprctl dispatch focuswindow "address:$telegram"
-    hyprctl dispatch hy3:locktab lock
-    obsidian &
-    sleep 2
-    hyprctl dispatch focuswindow "address:$telegram"
-    hyprctl dispatch hy3:locktab unlock
-    hyprctl keyword plugin:hy3:tab_first_window false
-    hyprctl dispatch togglespecialworkspace
-  '';
 in {
   imports = [./plugins];
   wayland.windowManager.hyprland = {
     enable = true;
-    package = null;
-    portalPackage = null;
 
-    plugins = [
-      pkgs.hyprlandPlugins.hy3
-    ];
+    extraConfig =
+      if devMode
+      then ''
+        dofile("${devPath}/hyprland.lua")
+      ''
+      else ''
+        --------------------
+        ---- AUTO START ----
+        --------------------
+        hl.window_rule({ match = { class = "obsidian" }, workspace = "special silent" })
+        hl.window_rule({ match = { class = "org.telegram.desktop" }, workspace = "special silent" })
+        hl.window_rule({ match = { class = "discord" }, workspace = "special silent" })
 
-    settings = lib.mkIf (!devMode) {
-      ##################
-      # CONF VARIABLES #
-      ##################
+        hl.on("hyprland.start", function ()
+          hl.exec_cmd("obsidian")
+          hl.exec_cmd("Telegram")
+          hl.exec_cmd("discord")
+        end)
 
-      "$MOD" = "SUPER";
-      "$terminal" = "kitty";
-      "$browser" = "zen";
+        ------------------
+        ---- MONITORS ----
+        ------------------
+        hl.monitor({ output = "eDP-1", mode = "2560x1600@165", position = "auto", scale = 1 })
+        hl.monitor({
+          output = "desc:Samsung Electric Company Odyssey G95NC HNTX601558",
+          mode = "7680x2160@240",
+          position = "auto",
+          scale = 1,
+        })
 
-      ######################
-      # STARTUP EXECUTIONS #
-      ######################
-      exec-once = [
-        "hypridle"
-        "${tabSpecialWorkspace}/bin/tabspecialworkspace"
-        "swayosd-server"
-      ];
+        ------------------
+        ---- PROGRAMS ----
+        ------------------
+        local mod = "SUPER"
+        local terminal = "kitty"
+        local browser = "zen"
 
-      ############
-      # MONITORS #
-      ############
-      monitor = [
-        "eDP-1, 2560x1600@165, auto, 1"
-        "desc:Samsung Electric Company Odyssey G95NC HNTX601558, 7680x2160@240, auto, 1"
-      ];
+        -------------------------------
+        ---- ENVIRONMENT VARIABLES ----
+        -------------------------------
+        hl.env("XCURSOR_SIZE", "24")
+        hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
+        hl.env("AQ_DRM_DEVICES", "/dev/dri/card0:/dev/dri/card1")
+        hl.env("WLR_DRM_NO_ATOMIC", "1")
+        ----------------------
+        ---- WINDOW RULES ----
+        ----------------------
+        hl.window_rule({ match = { initial_title = "Zen Browser" }, opacity = "1.0 override 0.9 override 1.0 override" })
+        hl.window_rule({ match = { title = "Picture-in-Picture" }, opacity = "1.0 override 1.0 override 1.0 override" })
+        hl.window_rule({ match = { class = "brave-browser" }, opacity = "1.0 override 0.9 override 1.0 override" })
+        hl.window_rule({ match = { class = "com.github.rafostar.Clapper" }, opacity = "1.0 override 1.0 override 1.0 override" })
+        hl.window_rule({ match = { class = "Logic" }, opacity = "1.0 override 1.0 override 1.0 override" })
+        hl.window_rule({ match = { class = "kicad" }, opacity = "1.0 override 1.0 override 1.0 override" })
 
-      #########################
-      # ENVIRONMENT VARIABLES #
-      #########################
-      env = [
-        "XCURSOR_SIZE,24"
-        "XCURSOR_THEME,Bibata-Modern-Ice"
-        "AQ_DRM_DEVICES,/dev/dri/card0:/dev/dri/card1"
-        "WLR_DRM_NO_ATOMIC,1"
-      ];
+        -----------------------
+        ---- LOOK AND FEEL ----
+        -----------------------
+        hl.layout.register("columns", {
+          recalculate = function(ctx)
+            local n = #ctx.targets
+            if n == 0 then
+              return
+            end
 
-      ################
-      # WINDOW RULES #
-      ################
+            for i, target in ipairs(ctx.targets) do
+              target:place(ctx:column(i, n))
+            end
+          end,
+        })
 
-      # Zen Browser
-      windowrule = [
-        #"size 50% 40%, floating: 1"
-        "opacity 1.0 override 0.875 override 1.0 override, initialTitle:(Zen Browser)"
-        "opacity 1.0 override 0.875 override 1.0 override, class:com.github.xournalpp.xournalpp"
-        "workspace special silent, class:vesktop"
-        "workspace special silent, title:Telegram"
-        "workspace special silent, class:obsidian"
-        "opacity 1.0 override, class:(.*Minecraft.*)"
-        "opacity 1.0 override, class:^(Microsoft.*)$"
-        "opacity 1.0 override, class:gimp"
-        "opacity 1.0 override, class:Code"
-        "noanim, title:^(ueberzugpp_.*)$"
+        hl.config({
+          general = {
+            border_size = 5,
+            gaps_in = 10,
+            gaps_out = 20,
+            layout = "columns", -- requires the hy3 plugin to be loaded (see note)
+            allow_tearing = true,
+          },
+          decoration = {
+            rounding = 10,
+            active_opacity = 0.8,
+            inactive_opacity = 0.8,
+            fullscreen_opacity = 1,
+            blur = {
+              enabled = true,
+              size = 7,
+              passes = 3,
+              ignore_opacity = true,
+              noise = 0.08,
+              contrast = 1.5,
+              xray = false,
+            },
+          },
+        })
 
-        "float, initialTitle:^(rmpc)$, title:^(rmpc)$"
-        "size 25% 42%, initialTitle:^(rmpc)$, title:^(rmpc)$"
+        --------------------
+        ---- ANIMATIONS ----
+        --------------------
+        hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
 
-        # --- Gamescope Rules ---
-        "noblur, class:^(gamescope)$"
-        "noshadow, class:^(gamescope)$"
-        "noanim, class:^(gamescope)$"
-        "rounding 0, class:^(gamescope)$"
+        hl.animation({ leaf = "windows", enabled = true, speed = 5, bezier = "myBezier" })
+        hl.animation({ leaf = "windowsOut", enabled = true, speed = 5, bezier = "default", style = "popin 80%" })
+        hl.animation({ leaf = "border", enabled = true, speed = 10, bezier = "default" })
+        hl.animation({ leaf = "borderangle", enabled = true, speed = 5, bezier = "default" })
+        hl.animation({ leaf = "fade", enabled = true, speed = 5, bezier = "default" })
+        hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default" })
+        hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 5, bezier = "default", style = "fade" })
 
-        "fullscreen, class:^(gamescope)$"
-        "monitor 0, class:^(gamescope)$"
+        ---------------
+        ---- INPUT ----
+        ---------------
+        hl.config({
+          input = {
+            kb_model = "us", -- (note: looks like it belongs in kb_layout; left as-is)
+            kb_layout = "",
+            kb_variant = "",
+            kb_options = "",
+            kb_rules = "",
+            touchpad = {
+              natural_scroll = true,
+              scroll_factor = 0.8,
+            },
+          },
+        })
 
-        "immediate, class:^(gamescope)$"
-      ];
+        --------------
+        ---- MISC ----
+        --------------
+        hl.config({
+          misc = {
+            disable_splash_rendering = true,
+            vrr = 1,
+          },
+        })
 
-      #################
-      # GENERAL BINDS #
-      #################
-      bind = [
-        "$MOD, Return, exec, $terminal"
-        "$MOD SHIFT, Q, killactive"
-        "$MOD, W, exec, $browser"
-        "$MOD SHIFT, S, exec, ${makeScreenshotScript}/bin/make-screenshot"
-        "$MOD CTRL, S, exec, ${quickdrawScreenshotScript}/bin/quickdraw-screenshot"
-        "$MOD, E, exec, $terminal --title yazi yazi"
-        "$MOD, M, exec, $terminal --title rmpc rmpc"
-        "$MOD, C, exec, hyprctl dispatch togglefloating && if hyprctl activewindow | grep -q \"class: kitty\" && hyprctl activewindow | grep -q \"floating: 1\"; then hyprctl dispatch resizeactive exact 800 600 && hyprctl dispatch centerwindow; fi"
-        "$MOD, F, fullscreen, 0"
-        "$MOD SHIFT, F, fullscreen, 1"
-        "$MOD, R, exec, rofi -show drun"
-        "$MOD, X, togglespecialworkspace"
+        -------------------------------
+        ---  BINDS (representative) ---
+        -------------------------------
+        hl.bind(mod .. " + Return", hl.dsp.exec_cmd(terminal))
+        hl.bind(mod .. " + W", hl.dsp.exec_cmd(browser))
+        hl.bind(mod .. " + R", hl.dsp.exec_cmd("rofi -show drun"))
+        hl.bind(mod .. " + SHIFT + Q", hl.dsp.window.close())
+        hl.bind(mod .. " + F", hl.dsp.window.fullscreen())        -- toggle fullscreen
+        hl.bind(mod .. " + X", hl.dsp.workspace.toggle_special()) -- the unnamed special workspace
+        hl.bind(mod .. " + H", hl.dsp.focus({ direction = "left" }))
+        hl.bind(mod .. " + J", hl.dsp.focus({ direction = "down" }))
+        hl.bind(mod .. " + K", hl.dsp.focus({ direction = "up" }))
+        hl.bind(mod .. " + L", hl.dsp.focus({ direction = "right" }))
+        hl.bind(mod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
+        hl.bind(mod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
+        hl.bind(mod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
+        hl.bind(mod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
+        hl.bind(mod .. " + SHIFT + S", hl.dsp.exec_cmd("${makeScreenshotScript}/bin/make-screenshot"))
+        hl.bind(mod .. " + S", hl.dsp.exec_cmd("${quickdrawScreenshotScript}/bin/quickdraw-screenshot"))
 
-        "$MOD, H, hy3:movefocus, l"
-        "$MOD, J, hy3:movefocus, d"
-        "$MOD, K, hy3:movefocus, u"
-        "$MOD, L, hy3:movefocus, r"
-        "$MOD SHIFT, H, hy3:movewindow, l"
-        "$MOD SHIFT, J, hy3:movewindow, d"
-        "$MOD SHIFT, K, hy3:movewindow, u"
-        "$MOD SHIFT, L, hy3:movewindow, r"
-        "$MOD CTRL, H, resizeactive, -20 0"
-        "$MOD CTRL, J, resizeactive, 0 20"
-        "$MOD CTRL, K, resizeactive, 0 -20"
-        "$MOD CTRL, L, resizeactive, 20 0"
+        for i = 1, 9 do
+          hl.bind(mod .. " + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }))
+        end
 
-        # Switch workspaces with MOD + [0-9]
-        "$MOD, 1, workspace, 1"
-        "$MOD, 2, workspace, 2"
-        "$MOD, 3, workspace, 3"
-        "$MOD, 4, workspace, 4"
-        "$MOD, 5, workspace, 5"
-        "$MOD, 6, workspace, 6"
-        "$MOD, 7, workspace, 7"
-        "$MOD, 8, workspace, 8"
-        "$MOD, 9, workspace, 9"
+        hl.bind(mod .. " + SHIFT + X", hl.dsp.window.move({ workspace = "special" }))
 
-        # Move active window to a workspace with MOD + SHIFT + [0-9]
-        "$MOD SHIFT, 1, hy3:movetoworkspace, 1"
-        "$MOD SHIFT, 2, hy3:movetoworkspace, 2"
-        "$MOD SHIFT, 3, hy3:movetoworkspace, 3"
-        "$MOD SHIFT, 4, hy3:movetoworkspace, 4"
-        "$MOD SHIFT, 5, hy3:movetoworkspace, 5"
-        "$MOD SHIFT, 6, hy3:movetoworkspace, 6"
-        "$MOD SHIFT, 7, hy3:movetoworkspace, 7"
-        "$MOD SHIFT, 8, hy3:movetoworkspace, 8"
-        "$MOD SHIFT, 9, hy3:movetoworkspace, 9"
-        "$MOD SHIFT, Y, hy3:movetoworkspace, special"
+        -- Switch workspaces 1-9 (replaces nine near-identical lines).
+        for i = 1, 9 do
+          hl.bind(mod .. " + " .. i, hl.dsp.focus({ workspace = i }))
+        end
 
-        "$MOD, d, hy3:makegroup, h, ephemeral"
-        "$MOD, s, hy3:makegroup, v, ephemeral"
-        "$MOD, z, hy3:makegroup, tab, ephemeral"
-        "$MOD CTRL, z, hy3:changegroup, untab"
+        -- Mouse move/resize (was bindm) -> the { mouse = true } flag.
+        hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+        hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-        ", XF86AudioPlay, exec, swayosd-client --playerctl play-pause"
-        ", XF86AudioPause, exec, swayosd-client --playerctl play-pause"
-        ", XF86AudioNext, exec, swayosd-client --playerctl next"
-        ", XF86AudioPrev, exec, swayosd-client --playerctl previous"
-
-        # Elecom Deft Pro remap
-        ", mouse:278, exec, notify-send 'BTN_BACK pressed'"
-        ", mouse:277, exec, notify-send 'BTN_FORWARD pressed'"
-        ", mouse:279, exec, notify-send 'BTN_TASK pressed'"
-      ];
-
-      bindm = [
-        "$MOD, mouse:272, movewindow"
-        "$MOD, mouse:273, resizeactive"
-      ];
-
-      binde = [
-        ", XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
-        ", XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
-        ", XF86AudioMute, exec, swayosd-client --output-volume mute-toggle"
-        ", XF86AudioMicMute, exec, swayosd-client --input-volume mute-toggle"
-        ", XF86MonBrightnessUp, exec, swayosd-client  --brightness raise"
-        ", XF86MonBrightnessDown, exec, swayosd-client  --brightness lower"
-      ];
-
-      general = {
-        border_size = "5";
-        gaps_in = "10";
-        gaps_out = "20";
-        layout = "hy3";
-        allow_tearing = true;
-      };
-
-      animations = {
-        bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
-        animation = [
-          "windows, 1, 5, myBezier"
-          "windowsOut, 1, 5, default, popin 80%"
-          "border, 1, 10, default"
-          "borderangle, 1, 5, default"
-          "fade, 1, 5, default"
-          "workspaces, 1, 5, default"
-          "specialWorkspace, 1, 5, default, fade"
-        ];
-      };
-
-      decoration = {
-        rounding = "10";
-        active_opacity = "0.8";
-        inactive_opacity = "0.8";
-        fullscreen_opacity = "1";
-        blur = {
-          enabled = true;
-          size = 7;
-          passes = 3;
-          ignore_opacity = true;
-          noise = 0.08;
-          contrast = 1.5;
-          xray = false;
-          new_optimizations = true;
-        };
-      };
-
-      input = {
-        kb_model = "us";
-        kb_layout = "";
-        kb_variant = "";
-        kb_options = "";
-        kb_rules = "";
-
-        touchpad = {
-          natural_scroll = "true";
-          scroll_factor = "0.8";
-        };
-      };
-
-      misc = {
-        disable_splash_rendering = "true";
-        vfr = "false";
-        vrr = "1";
-      };
-
-      plugin = {
-        hy3 = {
-          group_inset = "0";
-          tabs = {
-            border_width = "1";
-            render_text = "false";
-            height = "20";
-            "col.active" = "rgba(33ccff20)";
-            "col.border.active" = "rgba(33ccffee)";
-            "col.inactive" = "rgba(30303020)";
-            "col.border.inactive" = "rgba(595959aa)";
-          };
-          autotile = {
-            enable = "true";
-            trigger_width = "800";
-            trigger_height = "500";
-          };
-        };
-      };
-    };
-    extraConfig = lib.optionalString devMode ''
-      source=${devPath}/hyprland.conf
-    '';
+        -- Media keys (was binde) -> { repeating = true }; locked so they fire on the lock screen.
+        hl.bind(
+          "XF86AudioRaiseVolume",
+          hl.dsp.exec_cmd("swayosd-client --output-volume raise"),
+          { locked = true, repeating = true }
+        )
+        hl.bind(
+          "XF86AudioLowerVolume",
+          hl.dsp.exec_cmd("swayosd-client --output-volume lower"),
+          { locked = true, repeating = true }
+        )
+        hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"), { locked = true })
+        hl.bind(
+          "XF86MonBrightnessUp",
+          hl.dsp.exec_cmd("swayosd-client --brightness raise"),
+          { locked = true, repeating = true }
+        )
+        hl.bind(
+          "XF86MonBrightnessDown",
+          hl.dsp.exec_cmd("swayosd-client --brightness lower"),
+          { locked = true, repeating = true }
+        )
+      '';
   };
 }

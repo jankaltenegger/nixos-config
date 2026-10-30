@@ -3,8 +3,6 @@
     opts.completeopt = ["menu" "menuone" "noselect"];
 
     plugins = {
-      # Don't crucify me please
-
       luasnip = {
         enable = true;
         settings = {
@@ -36,7 +34,6 @@
         settings.cmp = {
           enable = true;
           menu = {
-            copilot = "[copilot]";
             nvim_lsp = "[LSP]";
             nvim_lua = "[api]";
             path = "[path]";
@@ -54,7 +51,13 @@
             enabled = false;
           };
           suggestion = {
-            enabled = false;
+            enabled = true;
+            auto_trigger = true;
+            keymap = {
+              accept = "<C-CR>";
+              next = "<C-j>";
+              prev = "<C-k>";
+            };
           };
           filetypes = {
             javascript = true;
@@ -64,10 +67,6 @@
             "*" = true;
           };
         };
-      };
-
-      copilot-cmp = {
-        enable = true;
       };
 
       cmp = {
@@ -107,9 +106,6 @@
           };
 
           sources = [
-            {
-              name = "copilot";
-            }
             {
               name = "nvim_lsp";
             }

@@ -1,10 +1,7 @@
 {
   pkgs,
   unstable-pkgs,
-  unstable-small-pkgs,
-  lib,
   inputs,
-  secrets,
   ...
 }: {
   imports = [
@@ -16,7 +13,6 @@
     ./starship
     ./zsh
     ./yazi
-    ./configs
   ];
 
   home.packages = with pkgs;
@@ -29,8 +25,36 @@
       slurp # For Screenshots
       obsidian # Note-taking Software
       calibre # Book Management Software
-      clapper # Video Viewer
+      (symlinkJoin {
+        name = "clapper-auto-gpu";
+        paths = [ pkgs.clapper ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/clapper \
+            --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : "${pkgs.gst_all_1.gst-libav}/lib/gstreamer-1.0" \
+            --run '
+              for n in /sys/class/drm/renderD*; do
+                if grep -qi "PCI_ID=1002:744C" "$n/device/uevent" 2>/dev/null; then
+                  node=$(basename "$n")
+                  export MESA_VK_DEVICE_SELECT=1002:744c
+                  export DRI_PRIME=1002:744c
+                  export GST_PLUGIN_FEATURE_RANK="va''${node}h264dec:512,va''${node}h265dec:512,va''${node}av1dec:512,va''${node}vp9dec:512"
+                fi
+              done
+            '
+
+          for f in $out/share/applications/*.desktop; do
+            src=$(readlink -f "$f"); rm "$f"; install -m644 "$src" "$f"
+            sed -i "s|${pkgs.clapper}/bin/clapper|$out/bin/clapper|g" "$f"
+          done
+        '';
+      })
+      libva-utils # vainfo: list VA-API decode/encode profiles
+      gst_all_1.gstreamer # gst-inspect-1.0 / gst-launch-1.0
+      nvtopPackages.full # per-GPU decode-engine (VCN) monitoring
       gthumb # Media Viwer
+      qview # Image Viewer
+      resvg # SVG Renderer
       devenv # Development environments made easy
       mullvad-vpn # VPN
       vesktop
@@ -48,9 +72,15 @@
       ouch
       exiftool
       kdePackages.okular
-      brave
+      (brave.override {
+        commandLineArgs = [
+          "--force-device-scale-factor=1.5"
+          "--no-default-browser-check"
+        ];
+      })
       wl-clipboard
       rofi
+      xournalpp
 
       # Volume and Brightness Util
       brightnessctl
@@ -72,21 +102,23 @@
       kdePackages.okular
 
       obs-studio
-      jetbrains.idea-community
       vscode
-      jdk25_headless
-      maven
       arduino-language-server
       arduino-cli
       arduino-ide
+      claude-monitor
 
       saleae-logic-2
-      xournalpp
+
+      kdePackages.kdenlive
+
+      kicad
     ]
     ++ (with unstable-pkgs; [
       secretspec
-      winboat
       github-copilot-cli
+      ripdrag
+      claude-code
     ]);
 
   programs = {
@@ -96,12 +128,6 @@
       settings = {
         theme = "nord";
       };
-    };
-
-    direnv = {
-      enable = true;
-      enableZshIntegration = true;
-      nix-direnv.enable = true;
     };
 
     kitty = {

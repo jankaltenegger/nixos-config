@@ -1,31 +1,28 @@
 {
   inputs,
   pkgs,
+  unstable-pkgs,
   ...
 }: {
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
-    package = inputs.yazi.packages.${pkgs.system}.yazi;
+    package = pkgs.yazi;
     plugins = {
       inherit (pkgs.yaziPlugins) ouch;
+      inherit (unstable-pkgs.yaziPlugins) drag;
     };
     keymap = {
       mgr.prepend_keymap = [
         {
           run = "plugin ouch";
-          on = ["C"];
+          on = ["<C-c>"];
           desc = "Compress with ouch";
         }
         {
-          run = ''
-            shell -- if [ $# -eq 1 ]; then
-              ripdrag -i -x -W 256 -H 256 -s 250 "$1"
-            else
-              ripdrag -a -W 500 -H 500 -s 100 "$@"
-            fi
-          '';
+          run = "plugin drag";
           on = ["<C-d>"];
+          desc = "Drag and drop with ripdrag";
         }
       ];
     };

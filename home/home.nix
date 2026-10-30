@@ -8,9 +8,8 @@
   configHome = "${homeDirectory}/.config";
 
   myPackages = with pkgs; [
-    any-nix-shell #zsh support for nix shell
-    gammastep # F.LUX FOR LINUX???
     geoclue2
+    any-nix-shell #zsh support for nix shell
     eza # ls replacement
     fd # find replacement
     libnotify # notify-send command (no clue what this does)
@@ -27,7 +26,7 @@ in {
   home = {
     inherit username homeDirectory;
     packages = myPackages;
-    stateVersion = "24.05";
+    stateVersion = "26.05";
   };
 
   xdg = {
@@ -46,6 +45,13 @@ in {
         "text/html" = ["zen.desktop"];
         "x-scheme-handler/http" = ["zen.desktop"];
         "x-scheme-handler/https" = ["zen.desktop"];
+        "image/svg+xml" = ["zen.desktop"];
+        "image/jpeg" = ["com.interversehq.qView.desktop"];
+        "image/png" = ["com.interversehq.qView.desktop"];
+        "image/gif" = ["com.interversehq.qView.desktop"];
+        "image/webp" = ["com.interversehq.qView.desktop"];
+        "image/bmp" = ["com.interversehq.qView.desktop"];
+        "image/tiff" = ["com.interversehq.qView.desktop"];
       };
     };
   };

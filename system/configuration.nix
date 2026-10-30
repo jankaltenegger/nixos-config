@@ -54,6 +54,9 @@
   # For the love of fucking god do not touch shit below this
   boot = {
     kernelParams = ["ipv6.disable=1"];
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelModules = ["ntsync"];
+
     loader = {
       efi = {
         efiSysMountPoint = "/boot/efi";
@@ -143,6 +146,7 @@
   };
 
   services = {
+    geoclue2.enable = true;
     gvfs.enable = true;
 
     radicale = {
@@ -182,7 +186,7 @@
       enable = true;
       settings = rec {
         initial_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
+          command = "start-hyprland";
           user = "jan";
         };
         default_session = initial_session;
@@ -200,8 +204,13 @@
 
     hardware.bolt.enable = true;
     udev = {
-      packages = [pkgs.swayosd];
+      packages = [
+        pkgs.swayosd
+        pkgs.stlink
+        pkgs.saleae-logic-2
+      ];
     };
+
   };
 
   systemd.services = {
@@ -228,8 +237,8 @@
       enable = true;
       dns = "none";
     };
-    interfaces.eth0.mtu = 1472;
-    nameservers = ["1.1.1.1" "8.8.8.8"];
+
+    nameservers = ["1.1.1.1" "9.9.9.9"];
     enableIPv6 = false;
 
     nftables.enable = true;
@@ -278,6 +287,7 @@
       package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
       portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
+    gamescope.enable = true;
     gamemode = {
       enable = true;
       settings = {
@@ -310,6 +320,7 @@
         inputs.zen-browser.packages.${pkgs.system}.default
       ]
       ++ (with pkgs; [
+        stlink
         _1password-gui
         _1password-cli
         freerdp
@@ -340,8 +351,11 @@
         android-tools
         keychain
         bashInteractive
-
+        efibootmgr
         python315
+        gcc
+        cmake
+        gnumake
       ]);
 
     sessionVariables = {
@@ -363,6 +377,8 @@
     nerd-fonts.atkynson-mono
     roboto
     noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
   ];
 
   virtualisation.docker.enable = true;
